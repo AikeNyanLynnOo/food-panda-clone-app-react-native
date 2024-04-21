@@ -21,6 +21,8 @@ import MuiComIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import { TitleWithScrollView } from "../components/TitleWithScrollView";
 import { CuisineCard } from "../components/CuisineCard";
 import client, { urlFor } from "../sanity";
+import { RestaurantCard } from "../components/RestaurantCard";
+import { StatusBar } from "expo-status-bar";
 
 function HomeScreen() {
   const navigation = useNavigation();
@@ -33,6 +35,7 @@ function HomeScreen() {
   const [dailyDeals, setDailyDeals] = useState([]);
   const [landingCards, setLandingCards] = useState([]);
   const [cuisines, setCuisines] = useState([]);
+  const [restaurants, setRestaurants] = useState([]);
 
   useEffect(() => {
     client
@@ -48,7 +51,6 @@ function HomeScreen() {
     client
       .fetch('*[_type == "landingCard"]')
       .then((cards) => {
-        
         setLandingCards(
           cards.map((card) => ({ ...card, imgUri: urlFor(card.image).url() }))
         );
@@ -70,10 +72,25 @@ function HomeScreen() {
       .catch((e) => {
         console.log("Error>>", e);
       });
+    client
+      .fetch('*[_type == "restaurant"]{...,cuisines[]-> {...}}')
+      .then((rests) => {
+        setRestaurants(
+          rests.map((rest, index) => ({
+            ...rest,
+            imgUri: urlFor(rest.image).url(),
+            logoUri: urlFor(rest.logo).url(),
+          }))
+        );
+      })
+      .catch((e) => {
+        console.log("Error>>", e);
+      });
   }, []);
 
   return (
     <View>
+      <StatusBar style="light" />
       <ScrollView
         alwaysBounceVertical={false}
         bounces={true}
@@ -209,6 +226,16 @@ function HomeScreen() {
         />
 
         {/* End daily deals */}
+
+        {/* Start restaurant */}
+
+        <TitleWithScrollView
+          title="Popular Restaurants"
+          ChildEle={RestaurantCard}
+          dataArray={restaurants}
+          customClassName="py-5 bg-white p-4"
+        />
+        {/* End restaurants */}
 
         {/* Start cuisines */}
 

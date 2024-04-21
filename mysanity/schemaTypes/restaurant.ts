@@ -23,6 +23,11 @@ export default defineType({
       type: 'image',
     }),
     defineField({
+      name: 'logo',
+      title: 'Logo of the restaurant',
+      type: 'image',
+    }),
+    defineField({
       name: 'lat',
       title: 'Latitude',
       type: 'number',
